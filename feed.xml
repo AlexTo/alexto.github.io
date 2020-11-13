@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-11-11T12:23:31+11:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Alex’s Tech Blog</title><subtitle>Document my learning journey</subtitle><author><name>Alex To</name></author><entry><title type="html">Locating Objects without bounding boxes (Ribera et al., 2019)</title><link href="http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes.html" rel="alternate" type="text/html" title="Locating Objects without bounding boxes (Ribera et al., 2019)" /><published>2020-11-09T08:39:00+11:00</published><updated>2020-11-09T08:39:00+11:00</updated><id>http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes</id><content type="html" xml:base="http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes.html">&lt;blockquote&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-11-13T11:44:47+11:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Alex’s Tech Blog</title><subtitle>Document my learning journey</subtitle><author><name>Alex To</name></author><entry><title type="html">Locating Objects without bounding boxes (Ribera et al., 2019)</title><link href="http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes.html" rel="alternate" type="text/html" title="Locating Objects without bounding boxes (Ribera et al., 2019)" /><published>2020-11-09T08:39:00+11:00</published><updated>2020-11-09T08:39:00+11:00</updated><id>http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes</id><content type="html" xml:base="http://localhost:4000/2020/11/09/locating-objects-without-bounding-boxes.html">&lt;blockquote&gt;
   &lt;p&gt;In this paper , the authors proposed a loss function based on the average Hausdorff distance between two unordered sets of points. The proposed method has no notion of bounding boxes, region proposals or sliding windows.&lt;/p&gt;
 &lt;/blockquote&gt;
 
@@ -16,14 +16,14 @@
 
 &lt;p&gt;Now we have to think about the outputs of the network. Ideally, if we want to use \(d_{AH}\) as the loss function, we want the network to output a set of coordinates \((x, y)\), perhaps, at the final linear layer as illustrated in Figure 1.&lt;/p&gt;
 
-&lt;figure&gt;
+&lt;figure class=&quot;width_500&quot;&gt;
 &lt;p&gt;&lt;img src=&quot;/assets/images/nobboxes_1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
   &lt;figcaption&gt;Figure 1&lt;/figcaption&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;The issue is that the size of the final linear layer is fixed, so the estimated number of points is fixed. This is not desirable because the number of points is different from image to image so let’s not do that. Another way is to let the network output a heatmap or probability map \(P\) where \(p_{x, y}\) is the probability that \((x, y)\) is a key point similar to &lt;a class=&quot;citation&quot; href=&quot;#Ronneberger2015&quot;&gt;(Ronneberger et al., 2015)&lt;/a&gt; as illustrated in Figure 2.&lt;/p&gt;
 
-&lt;figure&gt;
+&lt;figure class=&quot;width_500&quot;&gt;
 &lt;p&gt;&lt;img src=&quot;/assets/images/nobboxes_2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
   &lt;figcaption&gt;Figure 2&lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -41,6 +41,34 @@
 \[\underset{a \in \Omega}{M_{\alpha}}[f(a)] = \left(\frac{1}{|A|}\sum_{a \in A}f^{\alpha}(a)\right)^{\frac{1}{\alpha}}\]
 
 &lt;p&gt;Quite a lot of things going on here so let’s break it down bit by bit.&lt;/p&gt;
+
+&lt;p&gt;Let&lt;/p&gt;
+
+\[U = \frac{1}{S + \epsilon}\sum_{a \in \Omega}p_a\min_{b \in B}d(a, b)\]
+
+\[V = \frac{1}{|B|}\sum_{b \in B} \underset{a \in \Omega}{M_{\alpha}}[p_ad(a, b) + (1-p_a)d_{max}]\]
+
+&lt;p&gt;First of all, the intuition of this loss function is that if a predicted point \(a\) is far from set \(B\) then \(p_a\) must be low. But wait, why do we need both \(U\) and \(V\) ? Well, if \(V\) is absent then the model will predict an empty set \(A\) by setting all \(p_a\) to 0, that will minimize the cost to 0. Similarly if \(U\) is absent then the model will predict the entire image as set \(A\), that will also minimize the cost to 0 as the image contains set \(B\) so the distance between the image and set \(B\) is 0. Both terms must be there so that the model won’t predict too few or too many points than expected.&lt;/p&gt;
+
+&lt;figure class=&quot;width_500&quot;&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/nobboxes_3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;figcaption&gt;Figure 3&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;\(U\) is an approximation to 
+\(\frac{1}{|A|}\sum_{a \in A}\min_{b \in B}d(a, b)\) so you might think we can do the same with \(V\) by letting&lt;/p&gt;
+
+\[V = \frac{1}{B}\sum_{b \in B}\min_{b \in B}p_ad(a, b)\]
+
+&lt;p&gt;However, unlike \(U\), now \(p_a\) appears inside the \(\min\) which makes the loss function not differentiable with respect to \(p\). A good approximation to the minimum function is the &lt;a href=&quot;https://en.wikipedia.org/wiki/Generalized_mean&quot;&gt;generalized mean&lt;/a&gt;. You may find some good discussion about it &lt;a href=&quot;https://mathoverflow.net/questions/35191/a-differentiable-approximation-to-the-minimum-function&quot;&gt;here&lt;/a&gt; on Mathoverflow.&lt;/p&gt;
+
+&lt;p&gt;One final thing to note is that the authors added a Smooth L1 Loss for the regression of the object count so the final loss becomes&lt;/p&gt;
+
+\[\mathcal{L}(p, Y) =  d_{WH}(p, Y) + \mathcal{L}_{reg}(C - \hat{C})\]
+
+&lt;p&gt;where \(C\) is the number of target points and \(\hat{C}\) is a scalar output from the network predicting the estimated object count.&lt;/p&gt;
+
+&lt;p&gt;Hope you like my post and if there is any part that is not clear, leave a comment below, so I can update this post with more details ;)&lt;/p&gt;
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 

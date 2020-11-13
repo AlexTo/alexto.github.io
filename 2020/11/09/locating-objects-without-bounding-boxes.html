@@ -194,14 +194,14 @@
 
 <p>Now we have to think about the outputs of the network. Ideally, if we want to use \(d_{AH}\) as the loss function, we want the network to output a set of coordinates \((x, y)\), perhaps, at the final linear layer as illustrated in Figure 1.</p>
 
-<figure>
+<figure class="width_500">
 <p><img src="/assets/images/nobboxes_1.png" alt="" /></p>
   <figcaption>Figure 1</figcaption>
 </figure>
 
 <p>The issue is that the size of the final linear layer is fixed, so the estimated number of points is fixed. This is not desirable because the number of points is different from image to image so let’s not do that. Another way is to let the network output a heatmap or probability map \(P\) where \(p_{x, y}\) is the probability that \((x, y)\) is a key point similar to <a class="citation" href="#Ronneberger2015">(Ronneberger et al., 2015)</a> as illustrated in Figure 2.</p>
 
-<figure>
+<figure class="width_500">
 <p><img src="/assets/images/nobboxes_2.png" alt="" /></p>
   <figcaption>Figure 2</figcaption>
 </figure>
@@ -219,6 +219,34 @@
 \[\underset{a \in \Omega}{M_{\alpha}}[f(a)] = \left(\frac{1}{|A|}\sum_{a \in A}f^{\alpha}(a)\right)^{\frac{1}{\alpha}}\]
 
 <p>Quite a lot of things going on here so let’s break it down bit by bit.</p>
+
+<p>Let</p>
+
+\[U = \frac{1}{S + \epsilon}\sum_{a \in \Omega}p_a\min_{b \in B}d(a, b)\]
+
+\[V = \frac{1}{|B|}\sum_{b \in B} \underset{a \in \Omega}{M_{\alpha}}[p_ad(a, b) + (1-p_a)d_{max}]\]
+
+<p>First of all, the intuition of this loss function is that if a predicted point \(a\) is far from set \(B\) then \(p_a\) must be low. But wait, why do we need both \(U\) and \(V\) ? Well, if \(V\) is absent then the model will predict an empty set \(A\) by setting all \(p_a\) to 0, that will minimize the cost to 0. Similarly if \(U\) is absent then the model will predict the entire image as set \(A\), that will also minimize the cost to 0 as the image contains set \(B\) so the distance between the image and set \(B\) is 0. Both terms must be there so that the model won’t predict too few or too many points than expected.</p>
+
+<figure class="width_500">
+<p><img src="/assets/images/nobboxes_3.png" alt="" /></p>
+  <figcaption>Figure 3</figcaption>
+</figure>
+
+<p>\(U\) is an approximation to 
+\(\frac{1}{|A|}\sum_{a \in A}\min_{b \in B}d(a, b)\) so you might think we can do the same with \(V\) by letting</p>
+
+\[V = \frac{1}{B}\sum_{b \in B}\min_{b \in B}p_ad(a, b)\]
+
+<p>However, unlike \(U\), now \(p_a\) appears inside the \(\min\) which makes the loss function not differentiable with respect to \(p\). A good approximation to the minimum function is the <a href="https://en.wikipedia.org/wiki/Generalized_mean">generalized mean</a>. You may find some good discussion about it <a href="https://mathoverflow.net/questions/35191/a-differentiable-approximation-to-the-minimum-function">here</a> on Mathoverflow.</p>
+
+<p>One final thing to note is that the authors added a Smooth L1 Loss for the regression of the object count so the final loss becomes</p>
+
+\[\mathcal{L}(p, Y) =  d_{WH}(p, Y) + \mathcal{L}_{reg}(C - \hat{C})\]
+
+<p>where \(C\) is the number of target points and \(\hat{C}\) is a scalar output from the network predicting the estimated object count.</p>
+
+<p>Hope you like my post and if there is any part that is not clear, leave a comment below, so I can update this post with more details ;)</p>
 
 <h2 id="references">References</h2>
 
