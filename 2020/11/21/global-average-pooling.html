@@ -16,41 +16,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Generative Adversarial Nets</title>
+    <title>Global average pooling</title>
 
-    <meta name="description" content="">
+    <meta name="description" content="Conventional CNNs perform convolution in the lower layers of the network. For classification, the feature maps of the last convolutional layer are vectorized...">
 
     <meta content="Alex's Tech Blog" property="og:site_name">
     
-        <meta content="Generative Adversarial Nets" property="og:title">
+        <meta content="Global average pooling" property="og:title">
     
     
         <meta content="article" property="og:type">
     
     
-        <meta content="" property="og:description">
+        <meta content="Conventional CNNs perform convolution in the lower layers of the network. For classification, the feature maps of the last convolutional layer are vectorized and fed into fully connected layers followed by a softmax layer. Global average pool is another strategy first proposed by (Lin et al., 2014) to replace the..." property="og:description">
     
     
-        <meta content="http://localhost:4000/2020/11/06/generative-adversarial-nets.html" property="og:url">
+        <meta content="http://localhost:4000/2020/11/21/global-average-pooling.html" property="og:url">
     
     
-        <meta content="2020-11-06T00:44:00+11:00" property="article:published_time">
+        <meta content="2020-11-21T14:25:00+11:00" property="article:published_time">
         <meta content="http://localhost:4000/about/" property="article:author">
     
     
     
         
-        <meta content="gan" property="article:tag">
+        <meta content="deep-learning" property="article:tag">
         
         <meta content="computer-vision" property="article:tag">
         
-        <meta content="deep-learning" property="article:tag">
+        <meta content="convolutional-neural-network" property="article:tag">
         
     
 
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="canonical" href="http://localhost:4000/2020/11/06/generative-adversarial-nets.html">
+    <link rel="canonical" href="http://localhost:4000/2020/11/21/global-average-pooling.html">
 
     <!-- For Latex -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -81,10 +81,13 @@
     <!-- Twitter cards -->
     <meta name="twitter:site"    content="@">
     <meta name="twitter:creator" content="@Alex To">
-    <meta name="twitter:title"   content="Generative Adversarial Nets">
+    <meta name="twitter:title"   content="Global average pooling">
 
     
-        <meta name="twitter:description" content="
+        <meta name="twitter:description" content="<blockquote>
+  <p>Conventional CNNs perform convolution in the lower layers of the network. For classification, the feature maps of the last convolutional layer are vectorized and fed into fully connected layers followed by a softmax layer. Global average pool is another strategy first proposed by (Lin et al., 2014)  to replace the traditional fully connected layers in CNNs.</p>
+</blockquote>
+
 ">
     
 
@@ -131,12 +134,12 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
     <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">Generative Adversarial Nets</h1>
+        <h1 class="post-title" itemprop="name headline">Global average pooling</h1>
         <p class="post-meta">
 
-            <time datetime="2020-11-06T00:44:00+11:00" itemprop="datePublished">
+            <time datetime="2020-11-21T14:25:00+11:00" itemprop="datePublished">
                 
-                Nov 6, 2020
+                Nov 21, 2020
             </time>
 
             <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -146,20 +149,20 @@
             <span>
         
           
-          <a class="post-tag" href="/tag/gan"><nobr>gan</nobr>&nbsp;</a>
+          <a class="post-tag" href="/tag/deep-learning"><nobr>deep-learning</nobr>&nbsp;</a>
         
           
           <a class="post-tag" href="/tag/computer-vision"><nobr>computer-vision</nobr>&nbsp;</a>
         
           
-          <a class="post-tag" href="/tag/deep-learning"><nobr>deep-learning</nobr>&nbsp;</a>
+          <a class="post-tag" href="/tag/convolutional-neural-network"><nobr>convolutional-neural-network</nobr>&nbsp;</a>
         
       </span>
             <!--
             <span class="share-buttons">
               <span class="share-button"><a class="twitter-share-button" href="https://twitter.com/share" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></span>
 
-              <span class="share-button"><span class="fb-like" data-href="/2020/11/06/generative-adversarial-nets.html" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></span></span>
+              <span class="share-button"><span class="fb-like" data-href="/2020/11/21/global-average-pooling.html" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></span></span>
             </span>
             <div style="clear: both;"/>
             -->
@@ -168,16 +171,41 @@
     </header>
 
     <div class="post-content" itemprop="articleBody">
-        
+        <blockquote>
+  <p>Conventional CNNs perform convolution in the lower layers of the network. For classification, the feature maps of the last convolutional layer are vectorized and fed into fully connected layers followed by a softmax layer. Global average pool is another strategy first proposed by (Lin et al., 2014)  to replace the traditional fully connected layers in CNNs.</p>
+</blockquote>
+
+<!--more-->
+
+<p>First, let’s have a look at a traditional CNN setup such as LeNet. The last two layers are the good old fully connected layers (FCs) before being connected to the final softmax layer.</p>
+
+<figure class="width_500">
+<p><img src="/assets/images/lenet.png" alt="" /></p>
+  <figcaption>Figure 1. CNN with fully connected layers</figcaption>
+</figure>
+
+<p>Okay, but FCs are prone to over-fitting so we could either apply drop-out <a class="citation" href="#hinton2012improving">(Hinton et al., 2012)</a> or get rid of FCs altogether with average pooling after the last convolutional layer <a class="citation" href="#Lin2014">(Lin et al., 2014)</a> as illustrated in Figure 2.</p>
+
+<figure class="width_500">
+<p><img src="/assets/images/lenet-gap.png" alt="" /></p>
+  <figcaption>Figure 2. CNN with global average pooling</figcaption>
+</figure>
+
+<p>And that’s the whole idea about global average pooling, simple isn’t it ? ;)</p>
+
+<ol class="bibliography"><li><span id="hinton2012improving">Hinton, G. E., Srivastava, N., Krizhevsky, A., Sutskever, I., &amp; Salakhutdinov, R. R. (2012). Improving neural networks by preventing co-adaptation of feature detectors. <i>ArXiv Preprint ArXiv:1207.0580</i>.</span></li>
+<li><span id="Lin2014">Lin, M., Chen, Q., &amp; Yan, S. (2014). Network in network. <i>2nd International Conference on Learning Representations, ICLR 2014 - Conference Track Proceedings</i>, 1–10.</span></li></ol>
 
     </div>
 
 
     <div class="page-navigation">
         
+        <a class="prev" href="/2020/11/09/locating-objects-without-bounding-boxes.html">&larr; Locating objects without bounding boxes</a>
+        
 
         
-        <a class="next" href="/2020/11/09/hausdorff-distance.html">Hausdorff Distance &rarr;</a>
+        <a class="next" href="/2020/11/27/learning-deep-features-for-discriminative-localization.html">Learning deep features for discriminative localization &rarr;</a>
         
     </div>
 

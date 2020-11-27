@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    
+      
+
+
+
+
+
+
+    
+    <meta property="og:image" content="https://raw.githubusercontent.com/AlexTo/alexto.github.io/main/assets/images/kl.jpg">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Learning deep features for discriminative localization</title>
+
+    <meta name="description" content="In this paper, the authors discussed how Global Average Pooling enables localization ability despite being trained on image-level labels i.e without bounding...">
+
+    <meta content="Alex's Tech Blog" property="og:site_name">
+    
+        <meta content="Learning deep features for discriminative localization" property="og:title">
+    
+    
+        <meta content="article" property="og:type">
+    
+    
+        <meta content="In this paper, the authors discussed how Global Average Pooling enables localization ability despite being trained on image-level labels i.e without bounding boxes." property="og:description">
+    
+    
+        <meta content="http://localhost:4000/2020/11/27/learning-deep-features-for-discriminative-localization.html" property="og:url">
+    
+    
+        <meta content="2020-11-27T22:20:00+11:00" property="article:published_time">
+        <meta content="http://localhost:4000/about/" property="article:author">
+    
+    
+    
+        
+        <meta content="cam" property="article:tag">
+        
+        <meta content="deep-learning" property="article:tag">
+        
+        <meta content="computer-vision" property="article:tag">
+        
+        <meta content="convolutional-neural-network" property="article:tag">
+        
+    
+
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="canonical" href="http://localhost:4000/2020/11/27/learning-deep-features-for-discriminative-localization.html">
+
+    <!-- For Latex -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+    <!-- Google Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-8161570-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <!-- For Facebook share button -->
+    <div id="fb-root"></div>
+    <script>
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <!-- Twitter cards -->
+    <meta name="twitter:site"    content="@">
+    <meta name="twitter:creator" content="@Alex To">
+    <meta name="twitter:title"   content="Learning deep features for discriminative localization">
+
+    
+        <meta name="twitter:description" content="<blockquote>
+  <p>In this paper, the authors discussed how Global Average Pooling enables localization ability despite being trained on image-level labels i.e without bounding boxes.</p>
+</blockquote>
+
+">
+    
+
+    
+        <meta name="twitter:card"  content="summary">
+        <meta name="twitter:image" content="">
+    
+    <!-- end of Twitter cards -->
+
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner" id='header-bar'>
+
+    <div class="wrapper">
+        
+        <a class="site-title" href="/">Alex&#39;s Tech Blog</a>
+
+        <!-- <nav class="site-nav">
+            <a class="page-link" href="http://lilianweng.github.io" target="_blank">&#x1f349; About</a>
+        </nav> -->
+        <nav class="site-nav">
+            <a class="page-link" href="/contact.html">&#x1f984; Contact</a>
+        </nav>
+        <nav class="site-nav">
+            <a class="page-link" href="/FAQ.html">&#x1F64B; FAQ</a>
+        </nav>
+        <!-- <nav class="site-nav">
+            <a class="page-link" href="/log.html">&#x231b; Log</a>
+        </nav> -->
+        <nav class="site-nav">
+            <a class="page-link" href="/archive.html">&#x231b; Archive</a>
+        </nav>
+
+    </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Learning deep features for discriminative localization</h1>
+        <p class="post-meta">
+
+            <time datetime="2020-11-27T22:20:00+11:00" itemprop="datePublished">
+                
+                Nov 27, 2020
+            </time>
+
+            <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+        by <span itemprop="name">Alex To</span>
+      </span>
+
+            <span>
+        
+          
+          <a class="post-tag" href="/tag/cam"><nobr>cam</nobr>&nbsp;</a>
+        
+          
+          <a class="post-tag" href="/tag/deep-learning"><nobr>deep-learning</nobr>&nbsp;</a>
+        
+          
+          <a class="post-tag" href="/tag/computer-vision"><nobr>computer-vision</nobr>&nbsp;</a>
+        
+          
+          <a class="post-tag" href="/tag/convolutional-neural-network"><nobr>convolutional-neural-network</nobr>&nbsp;</a>
+        
+      </span>
+            <!--
+            <span class="share-buttons">
+              <span class="share-button"><a class="twitter-share-button" href="https://twitter.com/share" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></span>
+
+              <span class="share-button"><span class="fb-like" data-href="/2020/11/27/learning-deep-features-for-discriminative-localization.html" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></span></span>
+            </span>
+            <div style="clear: both;"/>
+            -->
+
+        </p>
+    </header>
+
+    <div class="post-content" itemprop="articleBody">
+        <blockquote>
+  <p>In this paper, the authors discussed how Global Average Pooling enables localization ability despite being trained on image-level labels i.e without bounding boxes.</p>
+</blockquote>
+
+<!--more-->
+
+<p>The main motivation of this paper <a class="citation" href="#Zhou2016">(Zhou et al., 2016)</a> is how to generate decision heatmap or class activation maps (CAM) in CNNs. Simply put, if the CNN model classifies an image with label Y, we would like to know which pixels from the original image trigger such decision (Figure 1).</p>
+
+<figure class="width_500">
+<p><img src="/assets/images/cam-1.png" alt="" /></p>
+  <figcaption>Figure 1. Image taken from the paper</figcaption>
+</figure>
+
+<p>One observation is that the convo layers actually behave as object detectors with deeper layers learn more abstract concepts. Despite not being train with bounding boxes, the convo layers actually have a remarkable ability to localize objects but this ability is lost when fully connected layers are used in the last few layers in traditional CNNs.  <a href="/2020/11/21/global-average-pooling.html">Global Average Pooling</a> was introduced in <a class="citation" href="#Lin2014">(Lin et al., 2014)</a> to mitigate this problem. Removing FCs layers also reduces the number of parameters, thus, might reduce over-fitting.</p>
+
+<p>To use CAM, modification must be made to existing networks so that the <mark> final convo is followed by GAP and then a final FC layer. </mark></p>
+
+<blockquote>
+  <p>For a given image, let \(f_k(x, y)\) represent the activation of unit k in the last convolutional layer at spatial location \((x, y)\). Then, for unit \(k\), the result of performing global average pooling, \(F^k\) is \(\sum_{x,y}f_k(x, y)\)</p>
+</blockquote>
+
+<figure>
+<p><img src="/assets/images/cam-2.png" alt="" /></p>
+  <figcaption>Figure 2</figcaption>
+</figure>
+
+<p>As illustrated in Figure 2, \(f_k(x, y)\) is the single value at \((x, y)\) at the feature map \(k\). Since the convo layer is followed by GAP, \(F^k\) is the average of all \(f_k(x,y)\). We could also defined \(F^k\) as the sum of all \(f_k(x, y)\) as average is just the sum divided by a constant.</p>
+
+<p>As mentioned earlier, after GAP, we add a final FC layer for classification. Let \(S_c\) be the activation for class \(c\) before softmax. Then \(S_c\) is just the dot product between the vector \(F\) and the weight vector for \(c\)</p>
+
+\[S_c = F \cdot w^c = \sum_{k}w^c_kF^k\]
+
+<p>So far so good, we have established the “link” between \(S_c\) and vector \(F\). Let’s trace back one layer before \(F\) and establish the “link” between \(S_c\) and \((x, y)\). If we “extract” feature at location \((x, y)\) for every feature map to construct a vector \(f\) as shown in Figure 3, then notice that \(f\) has the same length as \(F\) and \(w^c\), obviously, due to GAP ;)</p>
+
+<figure>
+<p><img src="/assets/images/cam-3.png" alt="" /></p>
+  <figcaption>Figure 3</figcaption>
+</figure>
+
+<p>We define, \(M_c(x, y)\), the importance of \((x, y)\) as the dot product between \(f\) and \(w^c\)</p>
+
+\[M_c(x,y) = \sum_kw^c_kf_k(x,y)\]
+
+<p>Hence,</p>
+
+\[S_c = \sum_{x,y}M_c(x,y)\]
+
+<p>Since, \(S_c\) is the sum of all \(M_c(x, y)\) then the larger \(M_c(x, y)\) is, the more it contributes to \(S_c\) that leads to the classification of an image to class \(c\).</p>
+
+<p>Finally, we upscale \(M_c\) to the original size of the image to get the class activation map ;)</p>
+
+<ol class="bibliography"><li><span id="Zhou2016">Zhou, B., Khosla, A., Lapedriza, A., Oliva, A., &amp; Torralba, A. (2016). <i>Learning Deep Features for Discriminative Localization</i>. <i>1</i>.</span></li>
+<li><span id="Lin2014">Lin, M., Chen, Q., &amp; Yan, S. (2014). Network in network. <i>2nd International Conference on Learning Representations, ICLR 2014 - Conference Track Proceedings</i>, 1–10.</span></li></ol>
+
+    </div>
+
+
+    <div class="page-navigation">
+        
+        <a class="prev" href="/2020/11/21/global-average-pooling.html">&larr; Global average pooling</a>
+        
+
+        
+        <a class="next" href="/2020/11/28/visual-explanations-from-deep-networks-via-gradient-based-localization.html">Visual explanations from deep networks via gradient-based localization &rarr;</a>
+        
+    </div>
+
+    
+    <div id="disqus_thread"></div>
+<script>
+
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function () { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://alexto.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+    Disqus.</a></noscript>
+
+    
+
+</article>
+
+      </div>
+    </main>
+
+    <div style="clear: both;"/>
+<footer class="site-footer">
+    2019 &copy; Built by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> and <a href="https://github.com/jekyll/minima/" target="_blank">minima</a> | View <a href="https://github.com/alexto/myblog" target="_blank">this</a> on Github | <a href="/tags.html">Tags</a> | <a href="/contact.html">Contact</a> | <a href="/FAQ.html">FAQ</a>
+
+    <p>
+        <a href="/feed.xml" target="_blank">
+            <img src="/assets/images/logo_rss.png" />
+        </a>
+        <a href="https://github.com/alexto" target="_blank">
+            <img src="/assets/images/logo_github.png" />
+        </a>
+        <a href="https://www.linkedin.com/in/alex-to/" target="_blank">
+            <img src="/assets/images/logo_linkedin.png" />
+        </a>
+
+    </p>
+</footer>
+
+
+  </body>
+
+</html>

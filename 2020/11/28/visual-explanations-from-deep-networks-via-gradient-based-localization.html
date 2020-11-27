@@ -16,39 +16,43 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Hausdorff Distance</title>
+    <title>Visual explanations from deep networks via gradient-based localization</title>
 
-    <meta name="description" content="Hausdorff distance measures how far two set of points are from each other. Informally, it is the greatest of all the distances from a point in one set to the...">
+    <meta name="description" content="">
 
     <meta content="Alex's Tech Blog" property="og:site_name">
     
-        <meta content="Hausdorff Distance" property="og:title">
+        <meta content="Visual explanations from deep networks via gradient-based localization" property="og:title">
     
     
         <meta content="article" property="og:type">
     
     
-        <meta content="Hausdorff distance measures how far two set of points are from each other. Informally, it is the greatest of all the distances from a point in one set to the closest point in the other set." property="og:description">
+        <meta content="" property="og:description">
     
     
-        <meta content="http://localhost:4000/2020/11/09/hausdorff-distance.html" property="og:url">
+        <meta content="http://localhost:4000/2020/11/28/visual-explanations-from-deep-networks-via-gradient-based-localization.html" property="og:url">
     
     
-        <meta content="2020-11-09T08:35:00+11:00" property="article:published_time">
+        <meta content="2020-11-28T00:41:00+11:00" property="article:published_time">
         <meta content="http://localhost:4000/about/" property="article:author">
     
     
     
         
-        <meta content="maths" property="article:tag">
+        <meta content="grad-cam" property="article:tag">
         
-        <meta content="hausdorff-distance" property="article:tag">
+        <meta content="deep-learning" property="article:tag">
+        
+        <meta content="computer-vision" property="article:tag">
+        
+        <meta content="convolutional-neural-network" property="article:tag">
         
     
 
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="canonical" href="http://localhost:4000/2020/11/09/hausdorff-distance.html">
+    <link rel="canonical" href="http://localhost:4000/2020/11/28/visual-explanations-from-deep-networks-via-gradient-based-localization.html">
 
     <!-- For Latex -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -79,13 +83,10 @@
     <!-- Twitter cards -->
     <meta name="twitter:site"    content="@">
     <meta name="twitter:creator" content="@Alex To">
-    <meta name="twitter:title"   content="Hausdorff Distance">
+    <meta name="twitter:title"   content="Visual explanations from deep networks via gradient-based localization">
 
     
-        <meta name="twitter:description" content="<blockquote>
-  <p>Hausdorff distance measures how far two set of points are from each other. Informally, it is the greatest of all the distances from a point in one set to the closest point in the other set.</p>
-</blockquote>
-
+        <meta name="twitter:description" content="
 ">
     
 
@@ -132,12 +133,12 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
     <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">Hausdorff Distance</h1>
+        <h1 class="post-title" itemprop="name headline">Visual explanations from deep networks via gradient-based localization</h1>
         <p class="post-meta">
 
-            <time datetime="2020-11-09T08:35:00+11:00" itemprop="datePublished">
+            <time datetime="2020-11-28T00:41:00+11:00" itemprop="datePublished">
                 
-                Nov 9, 2020
+                Nov 28, 2020
             </time>
 
             <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -147,17 +148,23 @@
             <span>
         
           
-          <a class="post-tag" href="/tag/maths"><nobr>maths</nobr>&nbsp;</a>
+          <a class="post-tag" href="/tag/grad-cam"><nobr>grad-cam</nobr>&nbsp;</a>
         
           
-          <a class="post-tag" href="/tag/hausdorff-distance"><nobr>hausdorff-distance</nobr>&nbsp;</a>
+          <a class="post-tag" href="/tag/deep-learning"><nobr>deep-learning</nobr>&nbsp;</a>
+        
+          
+          <a class="post-tag" href="/tag/computer-vision"><nobr>computer-vision</nobr>&nbsp;</a>
+        
+          
+          <a class="post-tag" href="/tag/convolutional-neural-network"><nobr>convolutional-neural-network</nobr>&nbsp;</a>
         
       </span>
             <!--
             <span class="share-buttons">
               <span class="share-button"><a class="twitter-share-button" href="https://twitter.com/share" data-show-count="false">Tweet</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></span>
 
-              <span class="share-button"><span class="fb-like" data-href="/2020/11/09/hausdorff-distance.html" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></span></span>
+              <span class="share-button"><span class="fb-like" data-href="/2020/11/28/visual-explanations-from-deep-networks-via-gradient-based-localization.html" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></span></span>
             </span>
             <div style="clear: both;"/>
             -->
@@ -166,24 +173,16 @@
     </header>
 
     <div class="post-content" itemprop="articleBody">
-        <blockquote>
-  <p>Hausdorff distance measures how far two set of points are from each other. Informally, it is the greatest of all the distances from a point in one set to the closest point in the other set.</p>
-</blockquote>
-
-<!--more-->
-
-<h2 id="references">References</h2>
-
-<ol class="bibliography"></ol>
+        
 
     </div>
 
 
     <div class="page-navigation">
         
-
+        <a class="prev" href="/2020/11/27/learning-deep-features-for-discriminative-localization.html">&larr; Learning deep features for discriminative localization</a>
         
-        <a class="next" href="/2020/11/09/locating-objects-without-bounding-boxes.html">Locating objects without bounding boxes &rarr;</a>
+
         
     </div>
 
